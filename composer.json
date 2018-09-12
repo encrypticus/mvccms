@@ -1,0 +1,17 @@
+{
+  "name": "mvc/cms",
+  "authors": [
+    {
+      "name": "Charli Santiago",
+      "email": "badcoderspaik@gmail.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Engine\\": "engine",
+      "Cms\\":"cms",
+      "Admin\\":"admin"
+    }
+  }
+}
