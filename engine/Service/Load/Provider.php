@@ -7,9 +7,9 @@ use Engine\Load;
 use Engine\Service\AbstractProvider;
 
 /**
- * Класс-сервис, создающий объект класса Request
+ * Класс-сервис, создающий объект класса Load
  * Class Provider
- * @package Engine\Service\Request
+ * @package Engine\Service\Load
  */
 class Provider extends AbstractProvider {
 
@@ -25,7 +25,7 @@ class Provider extends AbstractProvider {
      */
     public function init() {
         //создание объекта класса Load
-        $load = new Load();
+        $load = new Load($this->di);
         //добавление зависимости (созданного объекта) в DI-контейнер
         $this->di->set($this->serviceName, $load);
     }

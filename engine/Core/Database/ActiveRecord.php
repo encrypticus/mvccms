@@ -44,6 +44,26 @@ trait ActiveRecord {
     }
 
     /**
+     * Возвращает одну запись из таблицы в виде массива
+     * @return array|null
+     */
+    public function findOne() {
+
+        //строка запроса
+        $query = $this->queryBuilder
+            ->select()
+            ->from($this->getTable())
+            ->where('id', $this->id)
+            ->sql();
+
+        //массив с результатами запроса
+        $result = $this->db->query($query, $this->queryBuilder->values);
+
+        return isset($result[0]) ? $result[0] : null;
+    }
+
+
+    /**
      * Вставляет новую запись в указанную таблицу, если при создании текущего объекта не был передан аргумент $id.
      * Обновляет запись в указанной таблице, id которой соответсвует значению аргумента $id, переданного при создании текущего
      * объекта
@@ -77,12 +97,15 @@ trait ActiveRecord {
                 $this->db->query($query, $this->queryBuilder->values);
             }
 
+            //вернуть id последнего вставленного элемента
+            return $this->db->lastInsertId();
+
         } catch (\Exception $e) {
             echo $e->getMessage();
 
-        } finally {
+        } /*finally {
             return $this;
-        }
+        }*/
     }
 
     /**
@@ -113,6 +136,7 @@ trait ActiveRecord {
      * @return ReflectionProperty[]
      */
     private function getProperties() {
+
         //объект класса ReflectionClass на основе объекта текущего класса
         $reflection = new ReflectionClass($this);
         $properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);

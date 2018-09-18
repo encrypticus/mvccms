@@ -23,7 +23,7 @@ class Theme {
     /**
      * @var array список параметров объекта вида, передаваемых в объект темы
      */
-    protected $data;
+    protected $data = [];
 
     /**
      * Устанавливает список параметров
@@ -116,7 +116,8 @@ class Theme {
         if (is_file($templateFile)) {//если по указанному пути лежит файл
 
             //извлечь переданные данные в переменные
-            extract($data);
+            extract(array_merge($data, $this->data));
+
             //и подключить файл шаблона
             require_once $templateFile;
 
