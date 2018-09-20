@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Александр
- * Date: 02.08.2018
- * Time: 19:51
- */
 
 namespace Engine\Core\Router;
 

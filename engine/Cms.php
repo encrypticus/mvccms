@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Александр
- * Date: 27.07.2018
- * Time: 12:21
- */
-
 namespace Engine;
 
 use Cms\Controller\ErrorController;
@@ -19,6 +12,7 @@ class Cms {
      * @var DI DI-контейнер
      */
     private $di;
+
     /**
      * @var \Engine\Core\Router\Router объект класса Router
      */
@@ -47,9 +41,11 @@ class Cms {
              * формирование которых осуществляется в методах класса Common::getMethod, Common::getPathUrl
              */
             $routerDispatch = $this->router->dispatch(Common::getMethod(), Common::getPathUrl());
+
             if ($routerDispatch == null) {
                 $routerDispatch = new DispatchedRoute('ErrorController:page404');
             }
+
             /**
              * Здесь мы берем свойство DispatchedRoute::controller (которое будет проинициализировано в коде выше и иметь вид
              * типа 'HomeController:news'), возвращаемое методом DispatchedRoute::getController, затем полученную строку
@@ -59,15 +55,18 @@ class Cms {
              *
              */
             list($class, $action) = explode(':', $routerDispatch->getController(), 2);
+
             /**
              * в переменную записываем строку с названием класса контроллера вместе с пространством имен
              */
             $controller = '\\' . ENV . '\\Controller\\' . $class;
+
             /**
              * Создаем контроллер полученного класса и вызываем его метод, прописанный в переменной action, передавая ему
              * необходимые параметры
              */
             call_user_func_array([new $controller($this->di), $action], $routerDispatch->getParams());
+
         } catch (\Exception $exception) {
             echo $exception->getMessage();
             exit;

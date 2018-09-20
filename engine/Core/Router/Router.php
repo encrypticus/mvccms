@@ -39,7 +39,7 @@ class Router {
      */
     public function add($key, $pattern, $controller, $method = 'GET') {
         $this->routes[$key] = [
-            'pattern' => $pattern,
+            'pattern' => rtrim($pattern, '/'),
             'controller' => $controller,
             'method' => $method
         ];
