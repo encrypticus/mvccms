@@ -43,11 +43,7 @@ class LoginController extends Controller {
      * Обрабатывает форму авторизации из шаблона login.php
      */
     public function authAdmin() {
-        /*$query = "SELECT *
-                          FROM user
-                          WHERE `email` = \"$params[email]\"
-                          AND `password` = md5(\"$params[password]\")
-                          LIMIT 1";*/
+
         /**
          * Данные из массива POST - POST['email'] и POST['password'] - логин и пароль
          */
@@ -83,9 +79,9 @@ class LoginController extends Controller {
             //которого содержат поля полученной записи
             $user = $result[0];
 
-            if ($user['role'] == 'admin') {//если данный элемент массива равен соответствующему значению, то сформировать
+            if ($user->role == 'admin') {//если данный элемент массива равен соответствующему значению, то сформировать
                 //хэш и записать в переменную
-                $hash = md5($user['id'] . $user['email'] . $user['password'] . $this->auth->salt());
+                $hash = md5($user->id . $user->email . $user->password . $this->auth->salt());
 
                 /**
                  * Строка запроса к базе(обновляет запись в таблице, выбранную по указанному id, вставляя в поле 'hash'
@@ -94,7 +90,7 @@ class LoginController extends Controller {
                 $update = $queryBuilder
                     ->update('user')
                     ->set(['hash' => $hash])
-                    ->where('id', $user['id'])
+                    ->where('id', $user->id)
                     ->sql();
                 /*echo $update . '<br>';
                 print_r($queryBuilder->values);*/
@@ -103,12 +99,6 @@ class LoginController extends Controller {
                  * Выполнить запрос к базе
                  */
                 $this->db->query($update, $queryBuilder->values);
-
-                /*$this->db->query("
-                    UPDATE user
-                    SET hash = :hash
-                    WHERE id = :id
-                ", ['hash' => $hash, 'id' => $user['id']]);*/
 
                 /**
                  * Авторизовать пользователя - записать в куки значение $hash

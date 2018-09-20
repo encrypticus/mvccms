@@ -110,8 +110,13 @@ class UrlDispatcher {
      * @return \Engine\Core\Router\UrlDispatcher
      */
     public function dispatch($method, $uri) {
+
+        //удаление концевого слэша
+        $uri = rtrim($uri, '/');
+
         //переменная хранит $this->routes['GET'] или $this->routes['POST']
         $routes = $this->routes(strtoupper($method));
+
         //если в массиве $routes присутствует ключ со значением $uri, то вернуть объект класса DispatchedRoute
         if (array_key_exists($uri, $routes)) {
             return new DispatchedRoute($routes[$uri]);
