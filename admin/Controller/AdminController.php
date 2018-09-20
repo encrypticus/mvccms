@@ -16,6 +16,13 @@ class AdminController extends Controller {
      * @var Auth \Engine\Core\Auth объект класса Auth
      */
     protected $auth;
+
+    /**
+     * @var array массив со значениями, который будет передаваться как аргумент в методы дочерних классов-контроллеров
+     * для использования в шаблонах страниц
+     */
+    protected $data = [];
+
     /**
      * AdminController constructor.
      * @param $di \Engine\DI\DI

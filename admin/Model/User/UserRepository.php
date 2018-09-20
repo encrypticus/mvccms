@@ -23,14 +23,4 @@ class UserRepository extends Model {
         $users = $this->db->query($getAllUsers);
         return $users;
     }
-
-    public function test() {
-        /*$user = new User(1);
-        $user->setEmail('encrypticus@gmail.com');
-        $user->setPassword('spaik87055091802');
-        $user->setRole('user');
-        $user->setHash('new_user');
-        $user->save();*/
-    }
-
 }

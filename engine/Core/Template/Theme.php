@@ -1,10 +1,6 @@
 <?php
-
 namespace Engine\Core\Template;
-
-
 class Theme {
-
     /**
      * Константа содержит список шаблонов для подключения в функциях header(), footer(), block() соответствующих шаблонов по
      * переданному имени. Значения используются в этих функциях для подстановки в функции sprintf
@@ -14,17 +10,14 @@ class Theme {
         'sidebar' => 'sidebar-s%',
         'footer' => 'footer-s%'
     ];
-
     /**
      * @var string
      */
     public $url = '';
-
     /**
      * @var array список параметров объекта вида, передаваемых в объект темы
      */
-    protected $data;
-
+    protected $data = [];
     /**
      * Устанавливает список параметров
      * @param mixed $data
@@ -32,7 +25,6 @@ class Theme {
     public function setData($data) {
         $this->data = $data;
     }
-
     /**
      * Возвращает список параметров
      * @return mixed
@@ -40,7 +32,6 @@ class Theme {
     public function getData() {
         return $this->data;
     }
-
     /**
      * Загружает и отображает шапку шаблона темы
      * @param string $name имя файла шаблона шапки
@@ -54,7 +45,6 @@ class Theme {
         //загрузить файл шаблона по полученному имени
         $this->loadTemplateFile($file);
     }
-
     /**
      * Загружает и отображает футер шаблона темы
      * @param string $name имя файла шаблона футера
@@ -68,7 +58,6 @@ class Theme {
         //загрузить файл шаблона по полученному имени
         $this->loadTemplateFile($file);
     }
-
     /**
      * Загружает и отображает сайдбар шаблона темы
      * @param string $name имя файла шаблона сайдбара
@@ -82,7 +71,6 @@ class Theme {
         //загрузить файл шаблона по полученному имени
         $this->loadTemplateFile($file);
     }
-
     /**
      * Загружает и отображает блок шаблона темы
      * @param string $name имя файла шаблона блока
@@ -91,13 +79,11 @@ class Theme {
     public function block($name = '', $data = []) {
         //привидение имени к строке
         $name = (string) $name;
-
         //загрузить файл шаблона блока, если он был передан
         if($name !== '') {
             $this->loadTemplateFile($name, $data);
         }
     }
-
     /**
      * Подключает файл шаблона по переданному имени
      * @param $fileName имя файла шаблона
@@ -105,23 +91,17 @@ class Theme {
      * @throws \Exception
      */
     private function loadTemplateFile($fileName, $data = []) {
-
         //путь к файлу шаблона
         $templateFile = ROOT_DIR . "/content/themes/default/{$fileName}.php";
-
         if(ENV == 'Admin') {// путь к файлу шаблона для админки
             $templateFile = ROOT_DIR . "/View/{$fileName}.php";
         }
-
         if (is_file($templateFile)) {//если по указанному пути лежит файл
-
             //извлечь переданные данные в переменные
-            extract($data);
+            extract(array_merge($data, $this->data));
             //и подключить файл шаблона
             require_once $templateFile;
-
         } else {//иначе выбросить исключение
-
             throw new \Exception(
                 sprintf('Не удается найти файл %s', $templateFile)
             );

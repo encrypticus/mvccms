@@ -30,11 +30,11 @@
                     aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="#">Admin CMS</a>
+            <a class="navbar-brand" href="/admin/">Admin CMS</a>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="/admin/">
                             <i class="icon-speedometer icons"></i> Home
                         </a>
                     </li>

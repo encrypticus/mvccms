@@ -143,7 +143,7 @@ class Connection {
      * @param int $mode режим вывода
      * @return array|int|null возвращаемое значение
      */
-    public function query(string $query, array $parameters = [], $mode = \PDO::FETCH_ASSOC) {
+    public function query(string $query, array $parameters = [], $mode = \PDO::FETCH_OBJ) {
         //обрезать пробелы в строке запроса
         $query = trim(str_replace('\r', '', $query));
         //инициализировать запрос

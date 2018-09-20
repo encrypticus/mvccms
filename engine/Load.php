@@ -1,67 +1,56 @@
 <?php
-
 namespace Engine;
-
+use Engine\DI\DI;
 /**
  * Создает клас наследника класса Model - [modelEntity]Repository
  * Class Load
  * @package Engine
  */
 class Load {
-
-    /**
-     * хранит строку с заполнителями для функции sprintf(). Строка хранит пространство имен класса сущности модели (например
-     * 'User' ) например \Admin\Model\User\User
-     */
-    const MASK_MODEL_ENTITY = '\%s\Model\%s\%s';
-
     /**
      * хранит строку с заполнителями для функции sprintf(). Строка хранит пространство имен класса [EntityName]Repository
      * (например UserRepository) - например \Admin\Model\User\UserRepository
      */
     const MASK_MODEL_REPOSITORY = '\%s\Model\%s\%sRepository';
-
     /**
-     * Создает и возвращает объект, содержащий два свойства: entity и repository. Первое свойство хранит строку с пространством
-     *  имен класса сущности модели - например '\Admin\Model\User\User'. Второе - объект класса [EntityName]Repository
+     * @var \Engine\DI\DI di-контейнер
+     */
+    public $di;
+    /**
+     * Load constructor.
+     * @param DI $di
+     */
+    public function __construct(DI $di) {
+        $this->di = $di;
+    }
+    /**
+     * Добавляет в di-контейнер зависимость 'model', значением которой является объект класса
+     * \Admin\Model\[ModelName]\[ModelRepository], например \Admin\Model\Page\PageRepository
      * @param string $modelName имя класса сущности модели
      * @param bool $modelDir
-     * @return \stdClass
+     * @return bool
      */
     public function model($modelName, $modelDir = false) {
-        // объект di-контейнера
-        global $di;
-
         // имя класса сущности модели
         $modelName = ucfirst($modelName);
-        // пустой объект
-        $model = new \stdClass();
         //если аргумент $modelDir передан - записать его значение в переменную
         $modelDir = $modelDir ? $modelDir : $modelName;
-
-        /**
-         * переменная будет содержать строку вида '\Admin\Model\[EntityDir]\[EntityName]'
-         * или '\Cms\Model\[EntityDir]\[EntityName]'
-         */
-        $namespaceEntity = sprintf(
-            self::MASK_MODEL_ENTITY,
-            ENV, $modelDir, $modelName
-        );
-
         /**
          * переменная будет содержать строку вида '\Admin\Model\[EntityDir]\[EntityRepository]'
-         * или '\Cms\Model\[EntityDir]\[EntityRepository]'
+         * или '\Cms\Model\[EntityDir]\[EntityRepository]', например \Admin\Model\Page\PageRepository
          */
-        $namespaceRepository = sprintf(
+        $namespaceModel = sprintf(
             self::MASK_MODEL_REPOSITORY,
             ENV, $modelDir, $modelName
         );
-
-        // стррока вида, например, // Admin\Model\User\User
-        $model->entity = $namespaceEntity;
-        // объект вида, например, new Admin\Model\User\UserRepository()
-        $model->repository = new $namespaceRepository($di);
-
-        return $model;
+        //булева переменная - true, если класс с искомым именем существует, иначе false
+        $isClassModel = class_exists($namespaceModel);
+        //если существует такой класс, до добавить новую зависимость в DI-контейнер
+        if ($isClassModel) {
+            $modelRegistry = $this->di->get('model') ?: new \stdClass();
+            $modelRegistry->{lcfirst($modelName)} = new $namespaceModel($this->di);
+            $this->di->set('model', $modelRegistry);
+        }
+        return $isClassModel;
     }
 }

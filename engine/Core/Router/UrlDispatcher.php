@@ -5,9 +5,7 @@
 
 namespace Engine\Core\Router;
 
-
 class UrlDispatcher {
-
     /**
      * @var array
      */
@@ -15,7 +13,6 @@ class UrlDispatcher {
         'GET',
         'POST'
     ];
-
     /**
      * @var array список роутов
      */
@@ -23,7 +20,6 @@ class UrlDispatcher {
         'GET' => [],
         'POST' => []
     ];
-
     /**
      * @var array список паттернов
      */
@@ -70,7 +66,6 @@ class UrlDispatcher {
         }
         //иначе преобразовать его и вернуть;
         return preg_replace_callback('#\((\w+):(\w+)\)#', [$this, 'replacePattern'], $pattern);
-
     }
 
     /**
@@ -87,7 +82,6 @@ class UrlDispatcher {
      */
     private function replacePattern($matches) {
         return "(?<{$matches[1]}>" . strtr($matches[2], $this->patterns) . ')';
-
     }
 
     /**
@@ -110,8 +104,12 @@ class UrlDispatcher {
      * @return \Engine\Core\Router\UrlDispatcher
      */
     public function dispatch($method, $uri) {
+        //удаление концевого слэша
+        $uri = rtrim($uri, '/');
+
         //переменная хранит $this->routes['GET'] или $this->routes['POST']
         $routes = $this->routes(strtoupper($method));
+
         //если в массиве $routes присутствует ключ со значением $uri, то вернуть объект класса DispatchedRoute
         if (array_key_exists($uri, $routes)) {
             return new DispatchedRoute($routes[$uri]);
@@ -147,5 +145,4 @@ class UrlDispatcher {
             }
         }
     }
-
 }
