@@ -97,10 +97,10 @@ APP.Widget = {
 
 APP.Widget.Notification = function (options) {
   var options = options || {},
-  that = this;
+    that = this;
   this.element = options.element || $("<div>");
   this.content = options.content || "";
-  this.element.text(this.content);
+  this.element.html(this.content);
 
   var width = options.width || "",
     marginLeft = options.marginLeft || -(parseInt(width) / 2) + "px",
@@ -110,7 +110,7 @@ APP.Widget.Notification = function (options) {
     top = options.top || "50px",
     marginTop = options.marginTop || "10px",
     display = "none",
-    backgroundColor = options.backgroundColor || "blue",
+    bgColor = options.bgColor || "blue",
     color = options.color || "white",
     textAlign = options.textAlign || "center",
     borderRadius = options.borderRadius || "5px",
@@ -127,7 +127,7 @@ APP.Widget.Notification = function (options) {
     left: left,
     top: top,
     marginTop: marginTop,
-    backgroundColor: backgroundColor,
+    backgroundColor: bgColor,
     color: color,
     textAlign: textAlign,
     borderRadius: borderRadius,
@@ -139,7 +139,7 @@ APP.Widget.Notification = function (options) {
 
   this.show = function (content) {
     var that = this;
-    if (content) this.element.text(content);
+    if (content) this.element.html(content);
     this.element.fadeIn('slow');
     return this.element;
   };
@@ -153,8 +153,8 @@ APP.Widget.Notification = function (options) {
   };
 
   this.content = function (content) {
-    if(!content) return content;
-    else this.element.text(content);
+    if (!content) return content;
+    this.element.html(content);
   };
 
   this.element.on("mouseover", function () {
@@ -169,16 +169,14 @@ APP.Widget.Notification.CheckForm = function (options) {
 };
 
 APP.inherit(APP.Widget.Notification.CheckForm, APP.Widget.Notification);
-APP.Net = {
-
-};
+APP.Net = {};
 APP.FormDataLoader = function (options) {
   var options = options || {},
     url = options.url || "",
     type = options.type || "post",
     form_element = options.form_element,
     success = options.success,
-    error = options.error ||function () {
+    error = options.error || function () {
         alert("Ошибка сети");
       },
     beforeSend = options.beforeSend;
@@ -193,27 +191,32 @@ APP.FormDataLoader = function (options) {
       contentType: false,
       cache: false,
       data: formData,
+      dataType: "html",
       success: success,
       beforeSend: beforeSend,
       error: error
     });
   };
 
+  this.reset = function () {
+    form_element[0].reset();
+  }
+
 
   /*form_element.on("submit", function (event) {
-    var formData = new FormData(form_element[0]);
-    $.ajax({
-      url: url,
-      type: type,
-      processData: false,
-      contentType: false,
-      cache: false,
-      data: formData,
-      success: success,
-      beforeSend: beforeSend,
-      error: error
-    });
-  });*/
+   var formData = new FormData(form_element[0]);
+   $.ajax({
+   url: url,
+   type: type,
+   processData: false,
+   contentType: false,
+   cache: false,
+   data: formData,
+   success: success,
+   beforeSend: beforeSend,
+   error: error
+   });
+   });*/
 
 };
 

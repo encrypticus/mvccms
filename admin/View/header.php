@@ -35,22 +35,22 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
                         <a class="nav-link" href="/admin/">
-                            <i class="icon-speedometer icons"></i> Home
+                            <i class="icon-speedometer icons"></i> Главная
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="icon-doc icons"></i> Pages
+                        <a class="nav-link" href="/admin/books/">
+                            <i class="icon-doc icons"></i> Список книг
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="icon-pencil icons"></i> Add Page
+                        <a class="nav-link" href="/admin/books/addBook/">
+                            <i class="icon-pencil icons"></i> Добавить книгу
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link" href="#">
-                            <i class="icon-equalizer icons"></i> Settings
+                            <i class="icon-equalizer icons"></i> Настройки
                         </a>
                     </li>
                 </ul>

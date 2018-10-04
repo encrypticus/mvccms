@@ -51,6 +51,7 @@ trait ActiveRecord {
             ->from($this->getTable())
             ->where('id', $this->id)
             ->sql();
+
         //массив с результатами запроса
         $result = $this->db->query($query, $this->queryBuilder->values);
         return isset($result[0]) ? $result[0] : null;
@@ -63,19 +64,25 @@ trait ActiveRecord {
      * @return $this
      */
     public function save() {
+
         //получить массив значений для обновления/вставки свойств в БД
         $properties = $this->getIssetProperties();
+
         try {//если был передан аргумент $id при создании объекта - обновить запись с соответствующим id в таблице
             if (isset($this->id)) {
+
                 //строка запроса
                 $query = $this->queryBuilder
                     ->update($this->getTable())
                     ->set($properties)
                     ->where('id', $this->id)
                     ->sql();
+
                 //отправка запроса
                 $this->db->query($query, $this->queryBuilder->values);
+
             } else {//если же аргумент не был передан - создать новую запись
+
                 //строка запроса
                 $query = $this->queryBuilder
                     ->insert($this->getTable())
@@ -84,13 +91,13 @@ trait ActiveRecord {
                 //отправка запроса
                 $this->db->query($query, $this->queryBuilder->values);
             }
+
             //вернуть id последнего вставленного элемента
             return $this->db->lastInsertId();
+
         } catch (\Exception $e) {
             echo $e->getMessage();
-        } /*finally {
-            return $this;
-        }*/
+        }
     }
 
     /**

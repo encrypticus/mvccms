@@ -129,6 +129,7 @@ class QueryBuilder {
 
     /**
      * Собирает строку запроса из элеметов массива sql
+     *
      * @return string
      */
     public function sql() {
