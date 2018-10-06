@@ -53,11 +53,25 @@ var formNotification = new APP.Widget.Notification.CheckForm({//Объект у�
     form_element: $("#updateBookForm"),// jquery-объект формы
 
     success: function (content) {//функция, которая выполнится в результате удачного ответа сервера
-      content = JSON.parse(content);
-      formNotification.content(content.message);
-      if (content.hasOwnProperty('coverUrl')) $('#coverContainer')[0].src = content.coverUrl;
-      console.log(content);
-      formNotification.hide();
+      try {
+        //парсинг json в объект
+        content = JSON.parse(content);
+
+        //сообщение как свойства распарсенного объекта
+        formNotification.content(content.message);
+
+        //если объект содержит указанное свойство - вставить изображение обложки в указанный элемент
+        if (content.hasOwnProperty('coverUrl')) $('#coverContainer')[0].src = content.coverUrl;
+
+        //если объект содержит указанное свойство - вставить строковое значение пути до файла книги в указанный элемент
+        if (content.hasOwnProperty('bookFileName'))  $('#urlContainer').text(content.bookFileName);
+
+      } catch (e) {//если ответ сервера не является валидной json-строкой - отобразить его как сообщение
+        formNotification.content(content);
+
+      } finally {//скрыть сообщение
+        formNotification.hide();
+      }
     },
 
     beforeSend: function () {//функция, которая выполнится перед отправкой данных на сервер

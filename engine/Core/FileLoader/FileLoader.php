@@ -77,6 +77,25 @@ class FileLoader {
     }
 
     /**
+     * Вырезает из md5-строки файла первые четыре символа и возвращает их как часть пути из двух вложенных одна в другую
+     * директорий - например 'f8/9v/'
+     *
+     * @return string часть пути к файлу обложки
+     */
+    public function getDirsFromMdFile() {
+        $md5 = $this->getMdFromFile();
+        $path = substr($md5, 0, 2) . '/' . substr($md5, 2, 2) . '/';
+        return $path;
+    }
+
+    public function getArrayDirsFromMdFile() {
+        $md5 = $this->getMdFromFile();
+        $path1 = substr($md5, 0, 2);
+        $path2 = substr($md5, 2, 2);
+        return [$path1, $path2];
+    }
+
+    /**
      * Получение md5 строки имени файла
      * @return string
      */
@@ -84,8 +103,14 @@ class FileLoader {
         return md5($this->fileName . microtime() . rand(0, 9999));
     }
 
+    /**
+     * Получение созданных из md5-строки временного файла загруженного изображения вложенных директорий и преобразованного
+     * названия названия файла плюс его расширение
+     *
+     * @return string Строка вида '/v9/90/787e8fhrf87wglalhyu.jpg'
+     */
     public function getRandomFileName() {
-        return $this->getMdFromFile() . '.' . $this->getFileExtension();
+        return $this->getDirsFromMdFile() . $this->getMdFromFile() . '.' . $this->getFileExtension();
     }
 
     /**
@@ -150,7 +175,7 @@ class FileLoader {
             'Ч' => 'Ch', 'Ш' => 'Sh', 'Щ' => 'Sch',
             'Ь' => '\'', 'Ы' => 'Y', 'Ъ' => '\'',
             'Э' => 'E', 'Ю' => 'Yu', 'Я' => 'Ya',
-            "’" =>'\''
+            "’" => '\''
         );
         return strtr($string, $converter);
     }
@@ -161,6 +186,24 @@ class FileLoader {
      */
     public function getFileExtension() {
         return pathinfo($this->getFileName(), PATHINFO_EXTENSION);
+    }
+
+    /**
+     * Рекурсивно обходит каталоги и файлы из $path и удаляет их
+     * @param string $path путь до каталога, который нужно удалить вместе со вложенными файлами и каталогами
+     * @return bool
+     */
+    public function removeDirRecursive($path) {
+        /** @var array $files список файлов и каталогов в указанном каталоге, за исключением текущего и родительского */
+
+        $files = array_diff(scandir($path), array('.','..'));
+
+        //пройтись по содержащемуся в каталоге списку файлов и катологов - если это каталог, то рекурсивно войти в него
+        //и продолжить чтение файлов и каталогов в нем, если же это файла, то удалить его
+        foreach ($files as $file) {
+            (is_dir("$path/$file")) ? $this->removeDirRecursive("$path/$file") : unlink("$path/$file");
+        }
+        return rmdir($path);
     }
 
 }

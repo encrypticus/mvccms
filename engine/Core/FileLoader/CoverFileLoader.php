@@ -32,8 +32,21 @@ class CoverFileLoader extends FileLoader {
         return $_SERVER['DOCUMENT_ROOT'] . $this->getCoverDir() . $this->getFileName();
     }
 
+    /**
+     * Возвращает путь до файла с изображением обложки - 'sitename/content/uploads/covers/9d/0w/s98diujt79o7y6j.jpg'
+     * @return string путь к изображению обложки книги
+     */
     public function getRandomCoverFullPath() {
+        /** @var string $path sitename + /content/uploads/covers/ + 9d/0w/ */
+        $path = $_SERVER['DOCUMENT_ROOT'] . $this->getCoverDir() . $this->getDirsFromMdFile();
+
+        //если не существует указанная структура каталогов, то создать её
+        if(!file_exists($path)) mkdir($path, 0777, true);
+
+        //записать в свойство this->randomName название файла изображения обложки
         $this->setRandomName($this->getRandomFileName());
+
+        //вернуть путь до изображения
         return $_SERVER['DOCUMENT_ROOT'] . $this->getCoverDir() . $this->getRandomName();
     }
 

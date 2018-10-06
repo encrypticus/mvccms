@@ -66,6 +66,7 @@ class BookController extends AdminController {
         /** @var array $files FILES-массив со значениями формы из шаблона add.php */
         $files = $this->request->files;
 
+        //Проверка полей формы на пустоту и установка соответствующих сообщений
         FormChecker::checkFields([
             $params['title'],
             $params['author'],
@@ -86,6 +87,7 @@ class BookController extends AdminController {
             FormChecker::setError('Не выбран файл книги');
         }
 
+        //Если в массиве присутствуют ошибки - вывести соответствующие сообщение и прервать выполнение
         if (FormChecker::issetErrors()) return false;
 
         /**
@@ -193,39 +195,24 @@ class BookController extends AdminController {
         /** @var array $files FILES-массив со значениями формы из шаблона add.php */
         $files = $this->request->files;
 
-        //если поле заголовка пустое, добавить в массив сообщение об ошибке
-        if (FormChecker::isEmpty($params['title'])) {
-            FormChecker::setError('Название книги не может быть пустым');
-        }
+        //Проверка полей формы на пустоту и установка соответствующих сообщений, если указанные поля пусты
+        FormChecker::checkFields([
+            $params['title'], //поле заголовка
+            $params['author'], //поле имени автора
+            $params['year'], //поле года издания
+            $params['description'], //поле описания
+            $params['shortDescription'] //поле краткого описания
+        ],
+            ['Название книги не может быть пустым', //если поле названия книги пустое
+                'Имя автора не может быть пустым', //если поле имени автора книги пустое
+                'Год издания не может быть пустым', //если поле года издания книги пустое
+                'Описание не может быть пустым', //если поле описания книги пустое
+                'Краткое описание не может быть пустым' //если поле краткого описания книги пустое
+            ]
+        );
 
-        //если поле имени автора пустое, добавить в массив сообщение об ошибке
-        if (FormChecker::isEmpty($params['author'])) {
-            FormChecker::setError('Имя автора не может быть пустым');
-        }
-
-        //если поле года издания пустое, добавить в массив сообщение об ошибке
-        if (FormChecker::isEmpty($params['year'])) {
-            FormChecker::setError('Год издания не может быть пустым');
-        }
-
-        //если поле описания пустое, добавить в массив сообщение об ошибке
-        if (FormChecker::isEmpty($params['description'])) {
-            FormChecker::setError('Описание не может быть пустым');
-        }
-
-        //если поле краткого описания пустое, добавить в массив сообщение об ошибке
-        if (FormChecker::isEmpty($params['shortDescription'])) {
-            FormChecker::setError('Краткое описание не может быть пустым');
-        }
-
-        if (FormChecker::errorsFound()) {//если массив не пуст
-
-            //вывести все имеющиеся сообщения об ошибках
-            FormChecker::displayErrors();
-
-            //и прервать выполнение функции
-            return false;
-        }
+        //Если в массиве присутствуют ошибки - вывести соответствующие сообщения и прервать выполнение
+        if (FormChecker::issetErrors()) return false;
 
         /**
          * массив, который будет содержать ключи 'bookFileName' и 'coverUrl' - строку со значением пути вместе с именем
@@ -247,6 +234,9 @@ class BookController extends AdminController {
             /** @var CoverFileLoader $coverLoader объект загрузчика файла обложки */
             $coverLoader = new CoverFileLoader('cover');
 
+            /** @var string $oldCoverUrl текущий путь к файлу обложки книги */
+            $oldCoverUrl = $_SERVER['DOCUMENT_ROOT'] . $bookData->coverUrl;
+
             if (!$coverLoader->isImageFile($coverLoader->getTmpName())) {//если это не файл изображения
 
                 //добавить в массив сообщение об ошибке
@@ -259,8 +249,17 @@ class BookController extends AdminController {
                 return false;
             }
 
-            /** @var string $oldCoverUrl текущий путь к файлу обложки книги */
-            $oldCoverUrl = $_SERVER['DOCUMENT_ROOT'] . $bookData->coverUrl;
+            /*if($coverLoader->getMdFromFile() == md5_file($oldCoverUrl)) {//если файл был загружен ранее
+
+                //добавить в массив сообщение об ошибке
+                FormChecker::setError('Изображение было загружено ранее');
+
+                //отобразить имеющиеся ошибки
+                FormChecker::displayErrors();
+
+                //прервать выполнение
+                return false;
+            }*/
 
             /** @var int $countCoverUrls число книг(записей) из БД, которые имеют одинаковый путь к файлу обложки,
              * то-есть ссылаются на один и тот же файл изображения */
@@ -271,8 +270,15 @@ class BookController extends AdminController {
 
             /** если на файл изображения обложки не ссылаются хотя бы две книги из БД и это не файл изображения по умолчанию */
             if ($countCoverUrls->count < 2 and $isNotDefaultCover) {
-                //удалить текущий файл обложки
-                unlink($oldCoverUrl);
+
+                /** @var string $dir1 полный путь до директории с файлом обложки вида 'sitename/uploads/covers/u8/9f' */
+                $dir1 = pathinfo($oldCoverUrl)['dirname'];
+
+                /** @var string $dir2 полный путь до директории уровнем выше директории $dir1 с файлом обложки вида 'sitename/uploads/covers/u8' */
+                $dir2 = substr($dir1, 0, -3);
+
+                //рекурсивно удалить файл и созданные при его загрузке содержащие его вложенные директории
+                $coverLoader->removeDirRecursive($dir2);
             }
 
             //перемещение загруженного файла обложки книги из временной директории в указанный католог
@@ -288,7 +294,6 @@ class BookController extends AdminController {
 
             /** @var BookFileLoader $bookLoader объект загрузчика файла книги */
             $bookLoader = new BookFileLoader('bookFile');
-            echo $bookLoader->getMdFileName();
 
             /** @var string $oldFile старое (тукущее) имя файла книги в БД включая корень, имя директории и имя файла */
             $oldFile = $_SERVER['DOCUMENT_ROOT'] . $bookData->bookFileName;

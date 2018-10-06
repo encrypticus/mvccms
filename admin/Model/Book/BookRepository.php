@@ -163,6 +163,12 @@ class BookRepository extends Model {
                 ->setShortDescription($params['shortDescription'])
                 ->setCategoryId($params['category']);
 
+            /** @var array $response массив, который будет запакован в json-строку и отправлен как ответ на запрос из
+             * формы из шаблона edit.php. Строка будет распарсена в объект, который будет содержать следующие свойства:
+             * message - сообщение после удачного добавления данных о книге в базу,
+             * bookFileName - путь к файлу с книгой,
+             * coverUrl - путь к файлу с изображением обложки
+             */
             $response = [];
 
             //если передан указанный параметр - инициализировать указанное свойство
